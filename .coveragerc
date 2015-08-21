@@ -1,0 +1,5 @@
+[paths]
+source = dictree
+
+[report]
+include = dictree*
