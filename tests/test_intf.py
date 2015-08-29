@@ -23,7 +23,7 @@ def test_popitem():
     for i in range(5):
         e.popitem()
 
-    assert not e.has_subtree
+    assert len(e) == 0
 
 
 def test_pop():
@@ -99,5 +99,4 @@ def test_setdefault():
 def test_clear():
     e = instanciate()
     e.clear()
-    assert not e.has_item
-    assert not e.has_subtree
+    assert len(e) == 0

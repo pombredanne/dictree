@@ -84,7 +84,7 @@ def test_del():
     elt = Dictree()
     elt[1, 2, 3] = 1
     del elt[1, 2, 3]
-    assert not elt.has_subtree
+    assert len(elt) == 0
 
 
 def test_del_keyerror():
