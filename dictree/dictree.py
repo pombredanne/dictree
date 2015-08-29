@@ -1,15 +1,12 @@
 # coding:utf-8
 
 from collections import MutableMapping
-from .labels import Wildcard, NoItem
+from .labels import WILDCARD, NO_ITEM
 
 
 class Dictree(MutableMapping):
-    WILDCARD = Wildcard()
-    _NO_ITEM = NoItem()
-
     def __init__(self):
-        self._item = self._NO_ITEM
+        self._item = NO_ITEM
         self._subtrees = {}
 
     @property
@@ -22,19 +19,15 @@ class Dictree(MutableMapping):
 
     @item.deleter
     def item(self):
-        self._item = self._NO_ITEM
+        self._item = NO_ITEM
 
     @property
     def has_item(self):
-        return self.item is not self._NO_ITEM
+        return self.item is not NO_ITEM
 
     @property
     def has_subtree(self):
         return len(self._subtrees) != 0
-
-    @property
-    def has_wildcard(self):
-        return self.WILDCARD in self._subtrees
 
     def __len__(self):
         n = sum(len(t) for t in self._subtrees.values())
@@ -61,35 +54,27 @@ class Dictree(MutableMapping):
                 return False
 
     def __getitem__(self, key):
+        try:
+            return self.__getitem(key)
+
+        except KeyError:
+            raise KeyError(key)
+
+    def __getitem(self, key):
         if len(key) == 0:
             if self.has_item:
                 return self.item
 
             else:
-                raise KeyError(key)
+                raise KeyError()
 
         else:
             head, tail = key[0], key[1:]
-            if head in self._subtrees:
-                try:
-                    return self._subtrees[head][tail]
+            try:
+                return self._subtrees[head].__getitem(tail)
 
-                except KeyError:
-                    try:
-                        return self._subtrees[self.WILDCARD][tail]
-
-                    except KeyError:
-                        raise KeyError(key)
-
-            elif self.has_wildcard:
-                try:
-                    return self._subtrees[self.WILDCARD][tail]
-
-                except KeyError:
-                    raise KeyError(key)
-
-            else:
-                raise KeyError(key)
+            except KeyError:
+                return self._subtrees[WILDCARD].__getitem(tail)
 
     def __setitem__(self, key, item):
         if len(key) == 0:
@@ -100,31 +85,27 @@ class Dictree(MutableMapping):
             self._subtrees.setdefault(head, self.__class__())[tail] = item
 
     def __delitem__(self, key):
+        try:
+            return self.__delitem(key)
+
+        except KeyError:
+            raise KeyError(key)
+
+    def __delitem(self, key):
         if len(key) == 0:
             if self.has_item:
                 del self.item
                 return not self.has_subtree
 
             else:
-                raise KeyError(key)
+                raise KeyError()
 
         else:
             head, tail = key[0], key[1:]
-            if head in self._subtrees:
-                try:
-                    become_empty = self._subtrees[head].__delitem__(tail)
+            if self._subtrees[head].__delitem(tail):
+                del self._subtrees[head]
 
-                except KeyError:
-                    raise KeyError(key)
-
-                else:
-                    if become_empty:
-                        del self._subtrees[head]
-
-                    return not self.has_subtree and not self.has_item
-
-            else:
-                raise KeyError(key)
+            return not self.has_subtree and not self.has_item
 
     def setdefault(self, key, default):
         if key in self:
@@ -135,61 +116,34 @@ class Dictree(MutableMapping):
             return default
 
     def find(self, key, strict=False):
+        try:
+            return self._find(key, strict)
+
+        except:
+            raise KeyError(key)
+
+    def _find(self, key, strict):
         if len(key) == 0:
             if self.has_item:
                 return self.item, ()
 
             else:
-                raise KeyError(key)
+                raise KeyError()
 
         else:
             head, tail = key[0], key[1:]
-            if head in self._subtrees:
+            try:
+                item, trace = self._subtrees[head]._find(tail, strict)
+                return item, (False,) + trace
+
+            except KeyError:
                 try:
-                    item, trace = self._subtrees[head].find(tail, strict)
-                    return item, (False,) + trace
-
-                except KeyError:
-                    try:
-                        t = self._subtrees[self.WILDCARD]
-                        item, trace = t.find(tail, strict)
-                        return item, (True,) + trace
-
-                    except KeyError:
-                        if strict:
-                            raise KeyError(key)
-
-                        else:
-                            try:
-                                return self.find(())
-
-                            except KeyError:
-                                raise KeyError(key)
-
-            elif self.has_wildcard:
-                try:
-                    t = self._subtrees[self.WILDCARD]
-                    item, trace = t.find(tail, strict)
+                    item, trace = self._subtrees[WILDCARD]._find(tail, strict)
                     return item, (True,) + trace
 
                 except KeyError:
                     if strict:
-                        raise KeyError(key)
+                        raise KeyError()
 
                     else:
-                        try:
-                            return self.find(())
-
-                        except KeyError:
-                            raise KeyError(key)
-
-            else:
-                if strict:
-                    raise KeyError(key)
-
-                else:
-                    try:
-                        return self.find(())
-
-                    except KeyError:
-                        raise KeyError(key)
+                        return self._find((), strict)

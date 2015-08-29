@@ -1,16 +1,16 @@
 # coding:utf-8
 
-from dictree import Dictree
+from dictree import Dictree, WILDCARD
 
 
 def instanciate():
     e = Dictree()
     e[1, 2, 3, 4] = 100
     e[1, 2, 3, 5] = 200
-    e[1, 2, 3, Dictree.WILDCARD] = 300
+    e[1, 2, 3, WILDCARD] = 300
     e[1, 2, 3] = 10
     e[1, 2, 4] = 20
-    e[1, Dictree.WILDCARD] = 30
+    e[1, WILDCARD] = 30
     return e
 
 

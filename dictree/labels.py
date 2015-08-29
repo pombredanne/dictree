@@ -7,3 +7,7 @@ class Wildcard(object):
 
 class NoItem(object):
     pass
+
+
+WILDCARD = Wildcard()
+NO_ITEM = NoItem()
