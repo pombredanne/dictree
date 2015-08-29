@@ -14,12 +14,12 @@ Example
 
 .. sourcecode:: python
 
-    from dictree import Dictree
+    from dictree import Dictree, WILDCARD
 
     elt = Dictree()
     elt[()] = 'apple'
     elt[1, 2] = 'orange'
-    elt[1, Dictree.WILDCARD] = 'banana'
+    elt[1, WILDCARD] = 'banana'
     elt[1, 2, 3] = 'grape'
     elt[1, 2, 4] = 'peach'
     """
