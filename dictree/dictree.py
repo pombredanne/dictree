@@ -134,7 +134,7 @@ class Dictree(MutableMapping):
             self[key] = default
             return default
 
-    def find(self, key):
+    def find(self, key, strict=False):
         if len(key) == 0:
             if self.has_item:
                 return self.item, ()
@@ -146,36 +146,50 @@ class Dictree(MutableMapping):
             head, tail = key[0], key[1:]
             if head in self._subtrees:
                 try:
-                    item, trace = self._subtrees[head].find(tail)
+                    item, trace = self._subtrees[head].find(tail, strict)
                     return item, (False,) + trace
 
                 except KeyError:
                     try:
-                        item, trace = self._subtrees[self.WILDCARD].find(tail)
+                        t = self._subtrees[self.WILDCARD]
+                        item, trace = t.find(tail, strict)
                         return item, (True,) + trace
 
                     except KeyError:
+                        if strict:
+                            raise KeyError(key)
+
+                        else:
+                            try:
+                                return self.find(())
+
+                            except KeyError:
+                                raise KeyError(key)
+
+            elif self.has_wildcard:
+                try:
+                    t = self._subtrees[self.WILDCARD]
+                    item, trace = t.find(tail, strict)
+                    return item, (True,) + trace
+
+                except KeyError:
+                    if strict:
+                        raise KeyError(key)
+
+                    else:
                         try:
                             return self.find(())
 
                         except KeyError:
                             raise KeyError(key)
 
-            elif self.has_wildcard:
-                try:
-                    item, trace = self._subtrees[self.WILDCARD].find(tail)
-                    return item, (True,) + trace
+            else:
+                if strict:
+                    raise KeyError(key)
 
-                except KeyError:
+                else:
                     try:
                         return self.find(())
 
                     except KeyError:
                         raise KeyError(key)
-
-            else:
-                try:
-                    return self.find(())
-
-                except KeyError:
-                    raise KeyError(key)

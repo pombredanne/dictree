@@ -121,3 +121,4 @@ def test_find_keyerror():
     elt[Dictree.WILDCARD, 1, 2] = 1
     elt[Dictree.WILDCARD, 2, 3] = 2
     raises_keyerror(lambda: elt.find((1, 1)), (1, 1))
+    raises_keyerror(lambda: elt.find((1, 1, 2, 3), True), (1, 1, 2, 3))
