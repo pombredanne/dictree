@@ -122,3 +122,12 @@ def test_find_keyerror():
     elt[WILDCARD, 2, 3] = 2
     raises_keyerror(lambda: elt.find((1, 1)), (1, 1))
     raises_keyerror(lambda: elt.find((1, 1, 2, 3), True), (1, 1, 2, 3))
+
+
+def test_building_a_big_tree_should_not_fail_with_maximum_recursion_error():
+    elt = Dictree()
+    for x in range(100):
+        data = range(1000)
+        while data:
+            elt[data] = 0
+            data.pop(0)
