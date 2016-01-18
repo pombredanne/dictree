@@ -1,13 +1,13 @@
 # coding:utf-8
 
 
+class Item(object):
+    pass
+
+
 class Wildcard(object):
     pass
 
 
-class NoItem(object):
-    pass
-
-
+ITEM = Item()
 WILDCARD = Wildcard()
-NO_ITEM = NoItem()

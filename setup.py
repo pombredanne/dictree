@@ -29,5 +29,5 @@ setup(
     packages=find_packages(),
     platforms='any',
     url='http://github.com/tomokinakamaru/dictree',
-    version='1.1.0'
+    version='1.2.0'
 )
