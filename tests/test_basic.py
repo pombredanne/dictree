@@ -112,9 +112,9 @@ def test_find_keyerror():
 
 
 def test_building_a_big_tree_should_not_fail_with_maximum_recursion_error():
-    elt = Dictree()
+    dt = Dictree()
     for x in range(100):
-        data = range(1000)
+        data = list(range(1000))
         while data:
-            elt[data] = 0
+            dt[data] = 0
             data.pop(0)
